@@ -1,25 +1,23 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./snack.css";
 
 const SnakeGame = () => {
   const boardRef = useRef(null);
   const scoreRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    // Detect mobile
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
     let inputdir = { x: 0, y: 0 };
-
-    // 🔇 Temporarily commented out audio
-    // const foodsound = new Audio("/eatsound.mp3");
-    // const gameover = new Audio("/gameover.mp3");
-    // const movesound = new Audio("/movesound.mp3");
-    // const musicsound = new Audio("/soundmusic.mp3");
-
     let speed = 4;
     let lastPantTime = 0;
     let snackarr = [{ x: 6, y: 7 }];
     let score = 0;
     let food = { x: 13, y: 15 };
-
     const scoreElement = scoreRef.current;
 
     function main(ctime) {
@@ -49,12 +47,9 @@ const SnakeGame = () => {
       const board = boardRef.current;
 
       if (iscolide(snackarr)) {
-        // gameover.play();
-        // musicsound.pause();
         inputdir = { x: 0, y: 0 };
         alert("Game Over! Press any key to play again. Your score is: " + score);
         snackarr = [{ x: 6, y: 7 }];
-        // musicsound.play();
         removescore();
       }
 
@@ -67,13 +62,11 @@ const SnakeGame = () => {
 
       // Snake eats food
       if (snackarr[0].y === food.y && snackarr[0].x === food.x) {
-        // foodsound.play();
         addscore();
         snackarr.unshift({
           x: snackarr[0].x + inputdir.x,
           y: snackarr[0].y + inputdir.y,
         });
-
         let a = 2;
         let b = 16;
         food = {
@@ -82,7 +75,6 @@ const SnakeGame = () => {
         };
       }
 
-      // Clear board
       board.innerHTML = "";
 
       // Draw snake
@@ -105,13 +97,7 @@ const SnakeGame = () => {
 
     window.requestAnimationFrame(main);
 
-    // 🔇 Temporarily disabled music autoplay
-    // document.addEventListener("DOMContentLoaded", () => {
-    //   musicsound.play();
-    // });
-
     document.addEventListener("keydown", (e) => {
-      // movesound.play();
       switch (e.key) {
         case "ArrowUp":
           inputdir = { x: -1, y: 0 };
@@ -139,12 +125,48 @@ const SnakeGame = () => {
       score = 0;
       scoreElement.textContent = "";
     }
+
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  // Mobile button control
+  const handleDirection = (dir) => {
+    switch (dir) {
+      case "up":
+        window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp" }));
+        break;
+      case "down":
+        window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown" }));
+        break;
+      case "left":
+        window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft" }));
+        break;
+      case "right":
+        window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight" }));
+        break;
+      default:
+        break;
+    }
+  };
 
   return (
     <div className="body">
       <div className="border" ref={boardRef}></div>
       <div className="score" ref={scoreRef}></div>
+
+      {/* Show buttons only on mobile */}
+      {isMobile && (
+        <div className="mobile-controls">
+          <div className="control-row">
+            <button className="btn up" onClick={() => handleDirection("up")}>⬆️</button>
+          </div>
+          <div className="control-row">
+            <button className="btn left" onClick={() => handleDirection("left")}>⬅️</button>
+            <button className="btn down" onClick={() => handleDirection("down")}>⬇️</button>
+            <button className="btn right" onClick={() => handleDirection("right")}>➡️</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

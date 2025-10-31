@@ -5,18 +5,17 @@
 }
 
 .body {
-  /* 🔥 Modern gradient + subtle grid pattern background */
   background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
   background-size: 400% 400%;
   animation: gradientMove 15s ease infinite;
 
   min-height: 100vh;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
 }
 
-/* Gradient animation for dynamic feel */
 @keyframes gradientMove {
   0% {
     background-position: 0% 50%;
@@ -29,10 +28,11 @@
   }
 }
 
+/* 🟩 Game Board */
 .border {
   background: linear-gradient(rgb(0, 119, 128), rgb(191, 219, 197));
   width: 90vmin;
-  height: 92vmin;
+  height: 90vmin;
   border: 2px solid black;
   display: grid;
   grid-template-columns: repeat(18, 1fr);
@@ -58,31 +58,72 @@
   border-radius: 12px;
 }
 
+/* 🟡 Score Board */
 .score {
-  font-size: 30px;
+  font-size: 24px;
   color: white;
   position: absolute;
-  top: 25px;
-  left: 20.6%;
-  text-align: center;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
   background: linear-gradient(#78c7c7, #d63f3f);
   border: 2px solid silver;
-  padding: 5px 15px;
+  padding: 6px 14px;
   border-radius: 10px;
 }
 
-/* Mobile responsive */
-@media (max-width: 412px) {
+/* ✅ Mobile Optimization */
+@media (max-width: 480px) {
   .border {
-    width: 95%;
-    height: 500px;
+    width: 90%;
+    height: 320px; /* 🔽 Reduced height for small screens */
     border: none;
-    border-radius: 30px;
-    box-shadow: 0px 0px 12px 12px #959d9d;
+    border-radius: 15px;
+    box-shadow: 0px 0px 10px 5px #959d9d;
   }
 
   .score {
-    top: 20px;
-    left: 6%;
+    font-size: 18px;
+    top: 10px;
+  }
+
+  /* 🎮 Mobile Control Buttons */
+  .mobile-controls {
+    position: relative;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .control-row {
+    display: flex;
+    justify-content: center;
+    margin: 3px 0;
+  }
+
+  .btn {
+    background-color: rgba(255, 255, 255, 0.25);
+    border: none;
+    margin: 4px;
+    font-size: 22px; /* 🔽 Smaller buttons */
+    padding: 10px;   /* 🔽 Compact padding */
+    border-radius: 50%;
+    color: white;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn:active {
+    background-color: rgba(255, 255, 255, 0.6);
+    transform: scale(0.95);
+  }
+}
+
+/* Hide controls on big screens */
+@media (min-width: 768px) {
+  .mobile-controls {
+    display: none;
   }
 }
