@@ -4,15 +4,14 @@ import "./snack.css";
 const SnakeGame = () => {
   const boardRef = useRef(null);
   const scoreRef = useRef(null);
+  const inputDirRef = useRef({ x: 0, y: 0 }); // 👈 yahan define kiya
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    // Detect mobile
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener("resize", checkMobile);
 
-    let inputdir = { x: 0, y: 0 };
     let speed = 4;
     let lastPantTime = 0;
     let snackarr = [{ x: 6, y: 7 }];
@@ -29,25 +28,18 @@ const SnakeGame = () => {
 
     function iscolide(array) {
       for (let i = 1; i < array.length; i++) {
-        if (array[i].x === array[0].x && array[i].y === array[0].y) {
-          return true;
-        }
+        if (array[i].x === array[0].x && array[i].y === array[0].y) return true;
       }
-      if (
-        array[0].x >= 18 ||
-        array[0].y >= 18 ||
-        array[0].x <= 0 ||
-        array[0].y <= 0
-      ) {
+      if (array[0].x >= 18 || array[0].y >= 18 || array[0].x <= 0 || array[0].y <= 0)
         return true;
-      }
     }
 
     function gameengine() {
       const board = boardRef.current;
+      const inputdir = inputDirRef.current; // 👈 yahan se direction milega
 
       if (iscolide(snackarr)) {
-        inputdir = { x: 0, y: 0 };
+        inputDirRef.current = { x: 0, y: 0 };
         alert("Game Over! Press any key to play again. Your score is: " + score);
         snackarr = [{ x: 6, y: 7 }];
         removescore();
@@ -60,7 +52,7 @@ const SnakeGame = () => {
       snackarr[0].x += inputdir.x;
       snackarr[0].y += inputdir.y;
 
-      // Snake eats food
+      // Eat food
       if (snackarr[0].y === food.y && snackarr[0].x === food.x) {
         addscore();
         snackarr.unshift({
@@ -82,8 +74,7 @@ const SnakeGame = () => {
         const newSnackElement = document.createElement("div");
         newSnackElement.style.gridRowStart = object.x;
         newSnackElement.style.gridColumnStart = object.y;
-        if (index === 0) newSnackElement.classList.add("snackhead");
-        else newSnackElement.classList.add("snackbody");
+        newSnackElement.classList.add(index === 0 ? "snackhead" : "snackbody");
         board.appendChild(newSnackElement);
       });
 
@@ -97,19 +88,20 @@ const SnakeGame = () => {
 
     window.requestAnimationFrame(main);
 
+    // Keyboard Controls
     document.addEventListener("keydown", (e) => {
       switch (e.key) {
         case "ArrowUp":
-          inputdir = { x: -1, y: 0 };
+          inputDirRef.current = { x: -1, y: 0 };
           break;
         case "ArrowDown":
-          inputdir = { x: 1, y: 0 };
+          inputDirRef.current = { x: 1, y: 0 };
           break;
         case "ArrowLeft":
-          inputdir = { x: 0, y: -1 };
+          inputDirRef.current = { x: 0, y: -1 };
           break;
         case "ArrowRight":
-          inputdir = { x: 0, y: 1 };
+          inputDirRef.current = { x: 0, y: 1 };
           break;
         default:
           break;
@@ -129,20 +121,20 @@ const SnakeGame = () => {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Mobile button control
+  // 👇 Mobile buttons also move the snake
   const handleDirection = (dir) => {
     switch (dir) {
       case "up":
-        window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp" }));
+        inputDirRef.current = { x: -1, y: 0 };
         break;
       case "down":
-        window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown" }));
+        inputDirRef.current = { x: 1, y: 0 };
         break;
       case "left":
-        window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft" }));
+        inputDirRef.current = { x: 0, y: -1 };
         break;
       case "right":
-        window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight" }));
+        inputDirRef.current = { x: 0, y: 1 };
         break;
       default:
         break;
@@ -154,7 +146,6 @@ const SnakeGame = () => {
       <div className="border" ref={boardRef}></div>
       <div className="score" ref={scoreRef}></div>
 
-      {/* Show buttons only on mobile */}
       {isMobile && (
         <div className="mobile-controls">
           <div className="control-row">
